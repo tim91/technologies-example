@@ -1,0 +1,102 @@
+package pl.jcommerce.search;
+
+import java.lang.reflect.ParameterizedType;
+import java.util.List;
+import java.util.Objects;
+
+import javax.annotation.PostConstruct;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
+
+import org.apache.lucene.queryparser.classic.ParseException;
+import org.apache.lucene.queryparser.classic.QueryParser;
+import org.apache.lucene.search.Query;
+import org.hibernate.search.jpa.FullTextEntityManager;
+import org.hibernate.search.jpa.FullTextQuery;
+import org.hibernate.search.query.dsl.QueryBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import pl.jcommerce.domain.Base;
+import pl.jcommerce.domain.Book;
+
+@Repository
+@Transactional
+public abstract class LuceneSearch<T extends Base> {
+
+    private Class<T> tClass;
+    
+    @Autowired
+    private EntityManager entityManager;
+    
+    private FullTextEntityManager fullTextEntityManager;
+    
+    @PostConstruct
+    public void init(){
+        final ParameterizedType type = (ParameterizedType)getClass().getGenericSuperclass();
+        tClass = (Class<T>)type.getActualTypeArguments()[0];
+    }
+
+    public List<T> search(String query){
+        
+        FullTextQuery fulltextSearchQuery = prepareQuery(query);
+        
+        return fulltextSearchQuery.getResultList();
+    }
+    
+    public List<Object[]> search(String query, String... projectionFields){
+        
+        FullTextQuery fulltextSearchQuery = prepareQuery(query);
+        
+        if(Objects.nonNull(projectionFields)){
+            fulltextSearchQuery.setProjection(projectionFields);
+        }
+        
+        return fulltextSearchQuery.getResultList();
+    }
+    
+    private FullTextQuery prepareQuery(String query){
+        QueryParser queryParser = new QueryParser("title", 
+                getFullTextEntityManager().getSearchFactory().getAnalyzer(tClass));
+        
+        Query luceneQuery = null;
+        try {
+            luceneQuery = queryParser.parse(query);
+        } catch (ParseException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        
+        return getFullTextEntityManager().createFullTextQuery(luceneQuery, tClass);
+    }
+    
+    
+    public List<T> rangeQuery(String fieldName, Object from, Object to){
+        
+        QueryBuilder dateQB = getFullTextEntityManager().getSearchFactory()
+                .buildQueryBuilder().forEntity( tClass ).get();
+        
+        Query rangeQuery = dateQB
+              .range()
+              .onField(fieldName)
+              .from(from).to(to)
+              .createQuery();
+       
+       FullTextQuery ftq = getFullTextEntityManager().createFullTextQuery(rangeQuery, tClass);
+       
+       return ftq.getResultList();
+    }
+
+    public void clearIndex(){
+        getFullTextEntityManager().purgeAll(tClass);
+    }
+
+    public FullTextEntityManager getFullTextEntityManager() {
+        if(Objects.isNull(this.fullTextEntityManager)){
+            return org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
+        }
+        return this.fullTextEntityManager;
+    }
+    
+    
+}
