@@ -155,6 +155,11 @@ var FirstAndLastNameForm = React.createClass({
 			React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'label',
+					null,
+					'First Name:'
+				),
 				React.createElement('input', { className: 'form-control',
 					type: 'text',
 					placeholder: 'First Name',
@@ -165,6 +170,11 @@ var FirstAndLastNameForm = React.createClass({
 			React.createElement(
 				'div',
 				null,
+				React.createElement(
+					'label',
+					null,
+					'First Name:'
+				),
 				React.createElement('input', { className: 'form-control',
 					type: 'text',
 					placeholder: 'Last Name',

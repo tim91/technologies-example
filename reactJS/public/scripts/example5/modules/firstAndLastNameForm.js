@@ -28,6 +28,7 @@ var FirstAndLastNameForm = React.createClass({
 		return (
 			<form>
 				<div>
+					<label>First Name:</label>
 					<input className="form-control"
 						type="text"
 						placeholder="First Name"
@@ -36,6 +37,7 @@ var FirstAndLastNameForm = React.createClass({
 					/>
 				</div>
 				<div>
+					<label>First Name:</label>
 					<input className="form-control"
 						type="text"
 						placeholder="Last Name"
