@@ -1,0 +1,1 @@
+browserify -t [ babelify --presets [ react ] ] example1.js > build\example1bundle.js
