@@ -10,8 +10,9 @@ public class MyCustomDateBridge implements StringBridge{
     @Override
     public String objectToString(Object object) {
         
-        String parsedDate = DateTools.dateToString( (Date)object, DateTools.Resolution.DAY );
-        return parsedDate;
+        return DateTools.dateToString( 
+                (Date)object,
+                DateTools.Resolution.DAY );
     }
 
 }

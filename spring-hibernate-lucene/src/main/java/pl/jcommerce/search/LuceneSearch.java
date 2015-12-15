@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import org.apache.log4j.Logger;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.Query;
@@ -18,12 +19,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import pl.jcommerce.domain.Base;
-import pl.jcommerce.domain.Book;
 
 @Repository
 @Transactional
 public abstract class LuceneSearch<T extends Base> {
 
+    private static final Logger LOG = Logger.getLogger(LuceneSearch.class);
+    
     private Class<T> tClass;
     
     @Autowired
@@ -31,21 +33,22 @@ public abstract class LuceneSearch<T extends Base> {
     
     private FullTextEntityManager fullTextEntityManager;
     
+    @SuppressWarnings("unchecked")
     @PostConstruct
     public void init(){
         final ParameterizedType type = (ParameterizedType)getClass().getGenericSuperclass();
         tClass = (Class<T>)type.getActualTypeArguments()[0];
     }
 
+    @SuppressWarnings("unchecked")
     public List<T> search(String query){
-        
         FullTextQuery fulltextSearchQuery = prepareQuery(query);
         
         return fulltextSearchQuery.getResultList();
     }
     
+    @SuppressWarnings("unchecked")
     public List<Object[]> search(String query, String... projectionFields){
-        
         FullTextQuery fulltextSearchQuery = prepareQuery(query);
         
         if(Objects.nonNull(projectionFields)){
@@ -63,14 +66,14 @@ public abstract class LuceneSearch<T extends Base> {
         try {
             luceneQuery = queryParser.parse(query);
         } catch (ParseException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            LOG.error(e);
         }
         
         return getFullTextEntityManager().createFullTextQuery(luceneQuery, tClass);
     }
     
     
+    @SuppressWarnings("unchecked")
     public List<T> rangeQuery(String fieldName, Object from, Object to){
         
         QueryBuilder dateQB = getFullTextEntityManager().getSearchFactory()
@@ -82,9 +85,9 @@ public abstract class LuceneSearch<T extends Base> {
               .from(from).to(to)
               .createQuery();
        
-       FullTextQuery ftq = getFullTextEntityManager().createFullTextQuery(rangeQuery, tClass);
+       FullTextQuery fullTextQuery = getFullTextEntityManager().createFullTextQuery(rangeQuery, tClass);
        
-       return ftq.getResultList();
+       return fullTextQuery.getResultList();
     }
 
     public void clearIndex(){
@@ -95,6 +98,7 @@ public abstract class LuceneSearch<T extends Base> {
         if(Objects.isNull(this.fullTextEntityManager)){
             return org.hibernate.search.jpa.Search.getFullTextEntityManager(entityManager);
         }
+        
         return this.fullTextEntityManager;
     }
     

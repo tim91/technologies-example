@@ -182,17 +182,6 @@ public class BookSearchTest {
 
     @Test
     public void projectionSearchTest() {
-//        watch.start("Only Lucene");
-//        List<Object[]> res = bookSearch.search("+title:lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
-//        watch.stop();
-//        
-//        Assert.assertEquals(2, res.size());
-//        List<String> titles = Arrays.asList("Lokomotywa", "Lokomotywa 2");
-//        res.forEach(el -> {
-//            Object[] objArr = (Object[]) el;
-//            String bookTitle = (String) objArr[1];
-//            Assert.assertTrue(titles.contains(bookTitle));
-//        });
         
         watch.start("Only Lucene");
         List<Object[]> result = bookSearch.search("title:Lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
@@ -220,5 +209,7 @@ public class BookSearchTest {
 
         result = bookSearch.search("+title:lokomotywa -title:książka", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(2, result.size());
+        
+        watch.stop();
     }
 }

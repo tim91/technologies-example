@@ -4,6 +4,7 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,7 +23,7 @@ import pl.jcommerce.search.BookSearch;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringApplicationConfiguration(App.class)
-public class BookSearchIntegrationTest {
+public class BookSearchAssociationTest {
 
     @Autowired
     private BookRepository bookRepo;
@@ -77,12 +78,12 @@ public class BookSearchIntegrationTest {
         System.out.println("Set UP DONE");
     }
     
-//    @After
-//    public void clear(){
-//        bookSearch.clearIndex();
-//        bookRepo.deleteAllInBatch();
-//        authorRepo.deleteAllInBatch();
-//    }
+    @After
+    public void clear(){
+        bookSearch.clearIndex();
+        bookRepo.deleteAllInBatch();
+        authorRepo.deleteAllInBatch();
+    }
     
 
     @Test
@@ -107,24 +108,24 @@ public class BookSearchIntegrationTest {
         Assert.assertEquals("Książka", result.get(0).getTitle());
     }
     
-//    @Test
-//    public void associationSynchronizationTest(){
-//        
-//        List<Book> res = bookSearch.search("+library.address:kolejowa");
-//        Assert.assertEquals(1, res.size());
-//        Assert.assertEquals("Książka", res.get(0).getTitle());
-//        
-//        Library l = libraryRepo.findAll().get(0);
-//        l.setAddress("kolejkowa");
-//        libraryRepo.save(l);
-//        
-//        res = bookSearch.search("+library.address:kolejowa");
-//        Assert.assertEquals(0, res.size());
-//        
-//        res = bookSearch.search("+library.address:kolejkowa");
-//        Assert.assertEquals(1, res.size());
-//        Assert.assertEquals("Książka", res.get(0).getTitle());
-//        
-//    }
+    @Test
+    public void associationSynchronizationTest(){
+        
+        List<Book> res = bookSearch.search("+library.address:kolejowa");
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals("Książka", res.get(0).getTitle());
+        
+        Library l = libraryRepo.findAll().get(0);
+        l.setAddress("kolejkowa");
+        libraryRepo.save(l);
+        
+        res = bookSearch.search("+library.address:kolejowa");
+        Assert.assertEquals(0, res.size());
+        
+        res = bookSearch.search("+library.address:kolejkowa");
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals("Książka", res.get(0).getTitle());
+        
+    }
    
 }
