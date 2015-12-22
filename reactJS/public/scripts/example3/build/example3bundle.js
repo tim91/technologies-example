@@ -104,7 +104,7 @@ var LoginForm = require("./modules/loginForm.js");
 ReactDOM.render(React.createElement(LoginForm, { submitUrl: 'user/login' }), document.getElementById('content'));
 
 },{"./modules/loginForm.js":3,"react":160,"react-dom":31}],3:[function(require,module,exports){
-var React = require('react');
+//var React = require('react');
 
 var LoginForm = React.createClass({
 	displayName: "LoginForm",
@@ -140,7 +140,7 @@ var FormInput = React.createClass({
 
 module.exports = LoginForm;
 
-},{"react":160}],4:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 (function (process){
 /**
  * Copyright 2013-2015, Facebook, Inc.

@@ -95,11 +95,16 @@ process.umask = function() { return 0; };
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+ReactDOM.render(React.createElement('h1', {
+  className: "helloClass",
+  id: "1"
+}, 'Hello, world!'), document.getElementById('content'));
+
 ReactDOM.render(React.createElement(
   'h1',
-  null,
-  'Hello, world!'
-), document.getElementById('content'));
+  { className: 'helloClass', id: '2' },
+  'Hello, world by JSX!'
+), document.getElementById('contentjsx'));
 
 },{"react":159,"react-dom":30}],3:[function(require,module,exports){
 (function (process){

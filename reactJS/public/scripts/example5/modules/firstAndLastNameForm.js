@@ -4,7 +4,7 @@ var ReactDOM = require('react-dom');
 var BaseForm = require("./baseForm.js");
 
 var FirstAndLastNameForm = React.createClass({
-	mixins: [BaseForm], //inheritance of method initMethod
+	mixins: [BaseForm], //inheritance from BaseForm
 	getInitialState: function(){
 		return {
 			firstName: "",

@@ -11,11 +11,10 @@ var MultiStepFormController = React.createClass({
 	saveFormState: function(formStateData){
 		this.state.savedFormsStates[this.state.currentState] = formStateData;
 	},
-	nextState: function(formStateData){
-		var currState = this.state.currentState;
-		var mapSize = Object.keys(this.props.forms).length;
+	nextState: function(){
+		var currStateNumber = this.state.currentState;
 		
-		if(currState < mapSize-1){
+		if(currStateNumber < this.getNumberOfRegisteredForms()-1){
 			
 			this.saveFormState(this.refs.currDisplayedForm.state);
 		
@@ -24,6 +23,9 @@ var MultiStepFormController = React.createClass({
 			})
 		}
 		
+	},
+	getNumberOfRegisteredForms: function(){
+		return Object.keys(this.props.forms).length;
 	},
 	prevState: function(){
 		var currState = this.state.currentState;
@@ -37,10 +39,14 @@ var MultiStepFormController = React.createClass({
 			})
 		}
 	},
+	getSavedStateOfForm: function(formIndex){
+		this.state.savedFormsStates[this.state.currentState];
+	},
 	render: function(){
 		var initFormData = null;
-		if(this.state.savedFormsStates[this.state.currentState] != null){
-			initFormData = this.state.savedFormsStates[this.state.currentState];
+		
+		if(this.getSavedStateOfForm(this.state.currentState) != null){
+			initFormData = this.getSavedStateOfForm(this.state.currentState);
 		}
 		
 		var FormToDisplay = this.props.forms[this.state.currentState];

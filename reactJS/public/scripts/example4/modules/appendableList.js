@@ -18,8 +18,8 @@ var AppendableList = React.createClass({
 	},
 	render: function(){
 		var tableRows = this.state.rows.map(
-						function(row){
-							return <ListRow rowValue={row.rowVal} />
+						function(row, i){
+							return <ListRow key={i} rowValue={row.rowVal} />
 						});
 		return(
 			<div>
@@ -41,7 +41,7 @@ var AppendableList = React.createClass({
 
 var ListRow = React.createClass({
 	render: function(){
-	return <tr><td>{this.props.rowValue}</td></tr>
+	return <tr key={this.props.key}><td key={this.props.key}>{this.props.rowValue}</td></tr>
 	}
 });
 

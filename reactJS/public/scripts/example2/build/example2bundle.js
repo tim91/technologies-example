@@ -99,15 +99,15 @@ process.umask = function() { return 0; };
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var ParametrizedInput = React.createClass({
-	displayName: 'ParametrizedInput',
+var InputWithParametrizedPlaceholder = React.createClass({
+	displayName: 'InputWithParametrizedPlaceholder',
 
 	render: function () {
 		return React.createElement('input', { id: this.props.inputId, placeholder: this.props.defaultValue });
 	}
 });
 
-ReactDOM.render(React.createElement(ParametrizedInput, { inputId: '100', defaultValue: 'write something' }), document.getElementById('content'));
+ReactDOM.render(React.createElement(InputWithParametrizedPlaceholder, { inputId: '100', defaultValue: 'write something' }), document.getElementById('content'));
 
 },{"react":159,"react-dom":30}],3:[function(require,module,exports){
 (function (process){

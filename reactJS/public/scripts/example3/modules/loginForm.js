@@ -1,4 +1,4 @@
-var React = require('react');
+var React = require('react');//Important!
 
 var LoginForm = React.createClass({
 	render: function(){

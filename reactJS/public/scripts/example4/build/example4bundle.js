@@ -92,7 +92,6 @@ process.chdir = function (dir) {
 process.umask = function() { return 0; };
 
 },{}],2:[function(require,module,exports){
-
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -115,6 +114,7 @@ var AppendableList = React.createClass({
 		};
 	},
 	onElementSubmit: function (element) {
+		//append row list
 		var currRows = this.state.rows;
 		currRows.push(element);
 		this.setState({
@@ -122,9 +122,8 @@ var AppendableList = React.createClass({
 		});
 	},
 	render: function () {
-
-		var tableRows = this.state.rows.map(function (row) {
-			return React.createElement(ListRow, { rowValue: row.rowVal });
+		var tableRows = this.state.rows.map(function (row, i) {
+			return React.createElement(ListRow, { key: i, rowValue: row.rowVal });
 		});
 		return React.createElement(
 			'div',
@@ -162,10 +161,10 @@ var ListRow = React.createClass({
 	render: function () {
 		return React.createElement(
 			'tr',
-			null,
+			{ key: this.props.key },
 			React.createElement(
 				'td',
-				null,
+				{ key: this.props.key },
 				this.props.rowValue
 			)
 		);
