@@ -27,4 +27,12 @@ public class Library extends Base {
     private Set<Book> books = new HashSet<Book>();
     
     
+    public Library() {
+    }
+
+
+    public Library(String address) {
+        super();
+        this.address = address;
+    }
 }

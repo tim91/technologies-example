@@ -48,7 +48,7 @@ public abstract class LuceneSearch<T extends Base> {
     }
     
     @SuppressWarnings("unchecked")
-    public List<Object[]> search(String query, String... projectionFields){
+    public List<Object[]> searchUsingProjection(String query, String... projectionFields){
         FullTextQuery fulltextSearchQuery = prepareQuery(query);
         
         if(Objects.nonNull(projectionFields)){

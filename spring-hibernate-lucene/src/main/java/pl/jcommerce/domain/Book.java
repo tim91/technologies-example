@@ -4,8 +4,10 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
@@ -34,17 +36,21 @@ public class Book extends Base {
     @Field
     private Long pageNumbers;
     
-    @OneToMany(fetch=FetchType.EAGER)
+    @OneToMany(fetch=FetchType.EAGER, cascade=CascadeType.PERSIST)
     @IndexedEmbedded
     private Set<Author> authors = new HashSet<Author>();
     
-    @ManyToOne
+    @ManyToOne(cascade=CascadeType.PERSIST)
     @IndexedEmbedded(depth=1)
     private Library library;
     
     @Field
-    @TikaBridge
+    @TikaBridge //String, URI, byte[], Blob
     private String content;
+    
+    @ManyToOne(cascade=CascadeType.PERSIST)
+    @IndexedEmbedded
+    private PublishingHouse publishingHouse;
 
     @Field
     @DateBridge(resolution = Resolution.HOUR)

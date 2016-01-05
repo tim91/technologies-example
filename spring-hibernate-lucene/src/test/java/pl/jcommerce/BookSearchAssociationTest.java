@@ -3,6 +3,7 @@ package pl.jcommerce;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Objects;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -37,45 +38,47 @@ public class BookSearchAssociationTest {
     @Autowired
     private BookSearch bookSearch;
     
+    private String title;
+    private long pageNumbers;
+    private String contentPath;
+    private Author author;
+    private Library library;
+    
     @Before
     public void prepareData(){
-        System.out.println("Set UP");
         
-        Book lokomotywa = new Book();
-        lokomotywa.setTitle("Lokomotywa");
-        Calendar gc = GregorianCalendar.getInstance();
-        gc.set(2010, 5, 15);
-        lokomotywa.setPublicationDate(new GregorianCalendar(2010, Calendar.JULY, 15).getTime());
-        lokomotywa.setPageNumbers(100L);
-        lokomotywa.setContent("books/lokomotywa.pdf");
-        bookRepo.save(lokomotywa);
+        this.title = "Lokomotywa";
+        this.pageNumbers = 100;
+        this.contentPath = "books/lokomotywa.pdf";
+        prepareBook();
         
-        Author tuwim = new Author("Julian", "Tuwim");
-        authorRepo.save(tuwim);
+        this.title = "Lokomotywa 2";
+        this.pageNumbers = 99;
+        this.contentPath = "books/ksiazka.pdf";
+        this.author = new Author("Julian", "Tuwim");
+        prepareBook();
         
-        Author mickiewicz = new Author("Adam", "Mickiewicz");
-        authorRepo.save(mickiewicz);
-        Library l = new Library();
-        l.setAddress("kolejowa 15");
-        libraryRepo.save(l);
+        this.title = "Książka";
+        this.pageNumbers = 200;
+        this.contentPath = "books/ksiazka.pdf";
+        this.author = new Author("Adam", "Mickiewicz");
+        this.library = new Library("kolejowa 15");
+        prepareBook();
         
-        Book lokomotywa2 = new Book();
-        lokomotywa2.setTitle("Lokomotywa 2");
-        lokomotywa2.setPublicationDate(new GregorianCalendar(2010, Calendar.JULY, 10).getTime());
-        lokomotywa2.setPageNumbers(99L);
-        lokomotywa2.addAuthor(tuwim);
-        lokomotywa2.setContent("books/ksiazka.pdf");
-        bookRepo.save(lokomotywa2);
+    }
+    
+    private void prepareBook(){
+        Book bookToSave = new Book();
+        bookToSave.setTitle(this.title);
+        bookToSave.setPageNumbers(this.pageNumbers);
+        bookToSave.setContent(this.contentPath);
         
-        Book l2 = new Book();
-        l2.setTitle("Książka");
-        l2.setPageNumbers(200L);
-        l2.addAuthor(mickiewicz);
-        l2.setContent("books/ksiazka.pdf");
-        l2.setLibrary(l);
-        bookRepo.save(l2);
-        
-        System.out.println("Set UP DONE");
+        if(!Objects.isNull(this.author)){
+            bookToSave.addAuthor(this.author);
+        }
+            
+        bookToSave.setLibrary(this.library);
+        bookRepo.save(bookToSave);
     }
     
     @After

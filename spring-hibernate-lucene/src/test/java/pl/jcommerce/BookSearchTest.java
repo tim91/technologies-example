@@ -1,6 +1,7 @@
 package pl.jcommerce;
 
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
 
@@ -30,6 +31,11 @@ public class BookSearchTest {
 
     @Autowired
     private BookRepository bookRepo;
+    
+    private String title;
+    private long pageNumbers;
+    private String contentPath;
+    private Date publicationDate;
 
     private static StopWatch watch;
 
@@ -46,30 +52,41 @@ public class BookSearchTest {
     @Before
     public void prepareData() {
 
-        Book lokomotywa = new Book();
-        lokomotywa.setTitle("Lokomotywa");
-        Calendar gc = GregorianCalendar.getInstance();
-        gc.set(2010, 5, 15);
-        lokomotywa.setPublicationDate(new GregorianCalendar(2010, Calendar.JULY, 15).getTime());
-        lokomotywa.setPageNumbers(100L);
-        lokomotywa.setContent("books/lokomotywa.pdf");
-        bookRepo.save(lokomotywa);
-
-        Book lokomotywa2 = new Book();
-        lokomotywa2.setTitle("Lokomotywa 2");
-        lokomotywa2.setPublicationDate(new GregorianCalendar(2010, Calendar.JULY, 10).getTime());
-        System.out.println("publicDate: " + lokomotywa2.getPublicationDate().getTime());
-        lokomotywa2.setPageNumbers(99L);
-        lokomotywa2.setContent("books/ksiazka.pdf");
-        bookRepo.save(lokomotywa2);
-
-        Book l2 = new Book();
-        l2.setTitle("Książka");
-        l2.setPageNumbers(200L);
-        l2.setContent("books/ksiazka.pdf");
-        bookRepo.save(l2);
+        this.title = "Lokomotywa";
+        this.pageNumbers = 100;
+        this.contentPath = "books/lokomotywa.pdf";
+        this.publicationDate = new GregorianCalendar(2010, Calendar.JULY, 15).getTime();
+        prepareBook();
+        
+        this.title = "Lokomotywa 2";
+        this.pageNumbers = 99;
+        this.contentPath = "books/ksiazka.pdf";
+        this.publicationDate = new GregorianCalendar(2010, Calendar.JULY, 10).getTime();
+        prepareBook();
+        
+        this.title = "Książka";
+        this.pageNumbers = 200;
+        this.contentPath = "books/ksiazka.pdf";
+        this.publicationDate = null;
+        prepareBook();
+        
+        this.title = "Artykuł";
+        this.pageNumbers = 2;
+        this.contentPath = "books/artykuł.txt";
+        this.publicationDate = null;
+        prepareBook();
     }
 
+    private void prepareBook(){
+        
+        Book bookToSave = new Book();
+        bookToSave.setTitle(this.title);
+        bookToSave.setPageNumbers(this.pageNumbers);
+        bookToSave.setContent(this.contentPath);
+        bookToSave.setPublicationDate(this.publicationDate);
+        bookRepo.save(bookToSave);
+    }
+    
     @After
     public void clear() {
         bookSearch.clearIndex();
@@ -81,13 +98,13 @@ public class BookSearchTest {
 
         watch.start("Lucene with DB access");
         
-        List<Book> result = bookSearch.search("title:Lokomotywa");
+        List<Book> result = bookSearch.search("+title:Lokomotywa");
         Assert.assertEquals(2, result.size());
         
-        result = bookSearch.search("title:lokomotywa");
+        result = bookSearch.search("+title:lokomotywa");
         Assert.assertEquals(2, result.size());
 
-        result = bookSearch.search("title:2");
+        result = bookSearch.search("+title:2");
         Assert.assertEquals(1, result.size());
 
         result = bookSearch.search("+title:lokomotywa");
@@ -160,54 +177,74 @@ public class BookSearchTest {
         res = bookSearch.search("+content:wiem");
         Assert.assertEquals(2, res.size());
 
+        res = bookSearch.search("+content: aktywów wolnych od podatku");
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals("Artykuł", res.get(0).getTitle());
+        
+        res = bookSearch.search("+title:artykuł");
+        Assert.assertEquals(1, res.size());
+        Assert.assertEquals("Artykuł", res.get(0).getTitle());
     }
 
     @Test
-    public void bookUpdateTest() {
-        List<Book> result = bookSearch.search("title:Lokomotywa");
+    public void searchBookUpdateTest() {
+        List<Book> result = bookSearch.search("+title:Lokomotywa");
         Assert.assertEquals(2, result.size());
 
         Book b = bookRepo.findByTitle("Lokomotywa");
         b.setTitle("lokomotywka");
         bookRepo.save(b);
 
-        result = bookSearch.search("title:Lokomotywa");
+        result = bookSearch.search("+title:Lokomotywa");
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("Lokomotywa 2", result.get(0).getTitle());
 
-        result = bookSearch.search("title:lokomotywka");
+        result = bookSearch.search("+title:lokomotywka");
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("lokomotywka", result.get(0).getTitle());
     }
 
     @Test
-    public void projectionSearchTest() {
+    public void searchBookDeleteTest() {
+        List<Book> result = bookSearch.search("+title:Lokomotywa");
+        Assert.assertEquals(2, result.size());
+
+        Book b = bookRepo.findByTitle("Lokomotywa");
+        bookRepo.delete(b);
+
+        result = bookSearch.search("+title:Lokomotywa");
+        Assert.assertEquals(1, result.size());
+        Assert.assertEquals("Lokomotywa 2", result.get(0).getTitle());
+    }
+    
+    @Test
+    public void searchByNameUsingProjectionTest() {
         
         watch.start("Only Lucene");
-        List<Object[]> result = bookSearch.search("title:Lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
+        List<Object[]> result = bookSearch.searchUsingProjection("+title:Lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(2, result.size());
         
-        result = bookSearch.search("title:lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(2, result.size());
 
-        result = bookSearch.search("title:2", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:2", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(1, result.size());
 
-        result = bookSearch.search("+title:lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:lokomotywa", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(2, result.size());
 
-        result = bookSearch.search("+title:lokomotywa 2", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:lokomotywa 2", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(2, result.size());
 
-        result = bookSearch.search("+title:2", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:2", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("Lokomotywa 2", result.get(0)[1]);
 
-        result = bookSearch.search("+title:Książka", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:Książka", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(1, result.size());
         Assert.assertEquals("Książka", result.get(0)[1]);
 
-        result = bookSearch.search("+title:lokomotywa -title:książka", new String[] { FullTextQuery.SCORE, "title" });
+        result = bookSearch.searchUsingProjection("+title:lokomotywa -title:książka", new String[] { FullTextQuery.SCORE, "title" });
         Assert.assertEquals(2, result.size());
         
         watch.stop();

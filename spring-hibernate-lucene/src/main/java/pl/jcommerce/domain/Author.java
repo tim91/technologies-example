@@ -23,4 +23,8 @@ public class Author extends Base{
     
     @Field
     private String lastName;
+    
+    public Author(){
+        
+    }
 }
